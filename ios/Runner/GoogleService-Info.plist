@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAijkmLo9K21wBX81qN4CEx4lV_VatlUxo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>399319667627</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.biteshare</string>
+	<key>PROJECT_ID</key>
+	<string>biteshare-ee6c8</string>
+	<key>STORAGE_BUCKET</key>
+	<string>biteshare-ee6c8.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:399319667627:ios:39c51ce730ef4715b578ee</string>
+</dict>
+</plist>

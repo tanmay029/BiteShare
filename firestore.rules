@@ -1,0 +1,44 @@
+// firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/write their own data
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Recipes - public read, authenticated write for owner
+    match /recipes/{recipeId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        (resource == null || request.auth.uid == resource.data.userId);
+    }
+    
+    // Comments - authenticated users can create, read all
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // Subscriptions - users can only access their own
+    match /subscriptions/{subscriptionId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // Notifications - users can only access their own
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.targetUserId;
+    }
+    
+    // Bookmarks - users can only access their own
+    match /bookmarks/{bookmarkId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+  }
+}
