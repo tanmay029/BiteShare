@@ -9,7 +9,6 @@ import 'app/bindings/initial_binding.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // ✅ FIX: Only initialize Firebase if not already initialized
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
