@@ -1,4 +1,6 @@
 // lib/main.dart
+import 'package:biteshare/app/utils/dummy_data_generator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,6 +15,11 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+  }
+
+  if (kDebugMode) {
+    // Uncomment the line below to generate dummy data (run once)
+    await DummyDataGenerator.generateDummyData();
   }
   
   runApp(BiteShareApp());

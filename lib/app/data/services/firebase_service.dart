@@ -1,7 +1,7 @@
 // lib/app/data/services/firebase_service.dart
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+// import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
 
@@ -14,42 +14,42 @@ class FirebaseService {
   Future<String> uploadVideo(File videoFile, String path) async {
     try {
       String fileName = '${const Uuid().v4()}.mp4';
-      Reference ref = _storage.ref().child('$path/$fileName');
+      Reference ref = _storage.ref().child(path).child(fileName);
       
+      // ✅ FIXED: Same approach for video upload
       UploadTask uploadTask = ref.putFile(videoFile);
-      TaskSnapshot snapshot = await uploadTask;
+      TaskSnapshot snapshot = await uploadTask.whenComplete(() {});
       
-      return await snapshot.ref.getDownloadURL();
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      return downloadUrl;
     } catch (e) {
+      print('Firebase Storage Error: $e');
       throw Exception('Failed to upload video: $e');
     }
   }
 
   Future<String> uploadImage(File imageFile, String path) async {
-  try {
-    // Compress image before upload
-    final compressedImage = await FlutterImageCompress.compressWithFile(
-      imageFile.absolute.path,
-      minWidth: 1024,
-      minHeight: 1024,
-      quality: 70,
-    );
-    
-    if (compressedImage != null) {
+    try {
+      // Generate unique filename with proper extension
       String fileName = '${const Uuid().v4()}.jpg';
-      Reference ref = _storage.ref().child('$path/$fileName');
       
-      UploadTask uploadTask = ref.putData(compressedImage);
-      TaskSnapshot snapshot = await uploadTask;
+      // Create proper storage reference
+      Reference ref = _storage.ref().child(path).child(fileName);
       
-      return await snapshot.ref.getDownloadURL();
+      // ✅ FIXED: Await the upload task completion
+      UploadTask uploadTask = ref.putFile(imageFile);
+      TaskSnapshot snapshot = await uploadTask.whenComplete(() {});
+      
+      // ✅ FIXED: Get download URL from the completed snapshot reference
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      return downloadUrl;
+    } catch (e) {
+      print('Firebase Storage Error: $e');
+      throw Exception('Failed to upload image: $e');
     }
-    
-    throw Exception('Image compression failed');
-  } catch (e) {
-    throw Exception('Failed to upload image: $e');
   }
-}
 
   Future<void> initializeNotifications() async {
     // Request permission for notifications
