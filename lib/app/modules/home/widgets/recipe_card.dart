@@ -1,4 +1,4 @@
-// lib/app/modules/home/widgets/recipe_card.dart
+// lib/app/modules/home/widgets/recipe_card.dart - Update to handle optional images
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -32,7 +32,7 @@ class RecipeCard extends StatelessWidget {
                   : null,
             ),
             title: Text(recipe.userName),
-            subtitle: Text(recipe.createdAt.toString()),
+            subtitle: Text(_formatTimeAgo(recipe.createdAt)),
             trailing: recipe.isPremium
                 ? const Chip(
                     label: Text('Premium'),
@@ -41,17 +41,60 @@ class RecipeCard extends StatelessWidget {
                 : null,
           ),
           
-          // Recipe Image/Video
+          // ✅ UPDATED: Optional Recipe Image/Video
           if (recipe.media.isNotEmpty)
             AspectRatio(
               aspectRatio: 16 / 9,
               child: CachedNetworkImage(
                 imageUrl: recipe.media.first.url,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
+                placeholder: (context, url) => Container(
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: Icon(Icons.error),
+                  ),
+                ),
+              ),
+            )
+          else
+            // ✅ NEW: Placeholder for recipes without images
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.orange.shade200,
+                    Colors.orange.shade100,
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.restaurant,
+                      size: 32,
+                      color: Colors.orange.shade600,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Recipe by ${recipe.userName}',
+                      style: TextStyle(
+                        color: Colors.orange.shade800,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           
@@ -69,16 +112,42 @@ class RecipeCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(recipe.description),
+                Text(
+                  recipe.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                
+                // Recipe Info
+                Row(
+                  children: [
+                    Icon(Icons.restaurant_menu, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${recipe.ingredients.length} ingredients',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                    const SizedBox(width: 16),
+                    Icon(Icons.list, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${recipe.steps.length} steps',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                  ],
+                ),
+                
                 const SizedBox(height: 8),
                 
                 // Tags
                 if (recipe.tags.isNotEmpty)
                   Wrap(
-                    spacing: 8.0,
-                    children: recipe.tags.map((tag) => Chip(
+                    spacing: 4.0,
+                    children: recipe.tags.take(3).map((tag) => Chip(
                       label: Text('#$tag'),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      labelStyle: const TextStyle(fontSize: 10),
                     )).toList(),
                   ),
               ],
@@ -108,7 +177,7 @@ class RecipeCard extends StatelessWidget {
                   icon: const Icon(Icons.comment),
                   onPressed: () => Get.toNamed('/recipe/${recipe.id}/comments'),
                 ),
-                Text('${recipe.commentsCount ?? 0}'),
+                Text('${recipe.commentsCount}'),
                 const SizedBox(width: 16),
                 
                 IconButton(
@@ -136,6 +205,20 @@ class RecipeCard extends StatelessWidget {
         ],
       ),
     );
+  }
+  
+  String _formatTimeAgo(DateTime dateTime) {
+    Duration difference = DateTime.now().difference(dateTime);
+    
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
   }
   
   void _shareRecipe(RecipeModel recipe) {
